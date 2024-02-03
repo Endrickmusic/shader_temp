@@ -1,4 +1,4 @@
-import { OrbitControls } from "@react-three/drei"
+import { OrbitControls, useTexture } from "@react-three/drei"
 import { useFrame, useThree } from "@react-three/fiber"
 import { useRef, useMemo } from "react"
 
@@ -10,7 +10,10 @@ import { DoubleSide, Vector2 } from "three"
 export default function Shader(){
 
     const meshRef = useRef();
-  
+
+    const texture01 = useTexture("./textures/clouds_02.jpg")
+    const viewport = useThree(state => state.viewport)
+
     useFrame((state) => {
       let time = state.clock.getElapsedTime()
   
@@ -28,11 +31,15 @@ export default function Shader(){
               },
           uResolution: {
             type: "v2",
-            value: new Vector2(4, 3),
-            }
-         }),[]
+            value: new Vector2(viewport.width, viewport.height),
+            },
+          texture01: {
+            type: "t",
+            value: texture01,
+            },
+          }),[viewport.width, viewport.height, texture01]
       )   
-      const viewport = useThree(state => state.viewport)
+
   return (
     <>
       <OrbitControls />    
