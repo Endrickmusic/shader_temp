@@ -11,10 +11,10 @@ import { MeshNormalMaterial, Scene } from "three"
 export default function Shader(){
 
     const meshRef = useRef()
-    const texture01 = useFBO()
+    const buffer = useFBO()
     // const texture01 = useTexture("./textures/clouds_02.jpg")
     const viewport = useThree(state => state.viewport)
-    const [scene] = useState(() => new Scene())
+    const scene = useThree(state => state.scene)
 
     useFrame((state) => {
       let time = state.clock.getElapsedTime()
@@ -32,7 +32,7 @@ export default function Shader(){
       // The createPortal below will mount the children of <Lens> into the new THREE.Scene above
       // The following code will render that scene into a buffer, whose texture will then be fed into
       // a plane spanning the full screen and the lens transmission material
-      state.gl.setRenderTarget(texture01)
+      state.gl.setRenderTarget(buffer)
       state.gl.setClearColor('#d8d7d7')
       state.gl.render(scene, state.camera)
       state.gl.setRenderTarget(null)
@@ -52,9 +52,9 @@ export default function Shader(){
             },
           texture01: {
             type: "t",
-            value: texture01,
+            value: buffer.texture,
             },
-          }),[viewport.width, viewport.height, texture01]
+          }),[viewport.width, viewport.height, buffer.texture]
       )   
 
   return (
