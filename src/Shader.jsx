@@ -1,5 +1,5 @@
 import { OrbitControls } from "@react-three/drei"
-import { useFrame } from "@react-three/fiber"
+import { useFrame, useThree } from "@react-three/fiber"
 import { useRef, useMemo } from "react"
 
 import vertexShader from "./shader/vertexShader.js"
@@ -32,12 +32,15 @@ export default function Shader(){
             }
          }),[]
       )   
-
+      const viewport = useThree(state => state.viewport)
   return (
     <>
       <OrbitControls />    
-      <mesh ref={meshRef}>
-          <planeGeometry args={[4, 3]} />
+      <mesh 
+      ref={meshRef}
+      scale={[viewport.width, viewport.height, 1]}
+      >
+          <planeGeometry args={[1, 1]} />
           <shaderMaterial
             uniforms={uniforms}
             vertexShader={vertexShader}
