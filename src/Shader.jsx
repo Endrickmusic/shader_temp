@@ -1,25 +1,41 @@
-import { OrbitControls, useTexture } from "@react-three/drei"
+import { OrbitControls, useTexture, useFBO } from "@react-three/drei"
 import { useFrame, useThree } from "@react-three/fiber"
-import { useRef, useMemo } from "react"
+import { useRef, useMemo, useState } from "react"
 
 import vertexShader from "./shader/vertexShader.js"
 import fragmentShader from "./shader/fragmentShader.js"
 import { DoubleSide, Vector2 } from "three"
-import { MeshNormalMaterial } from "three"
+import { MeshNormalMaterial, Scene } from "three"
 
 
 export default function Shader(){
 
-    const meshRef = useRef();
-
-    const texture01 = useTexture("./textures/clouds_02.jpg")
+    const meshRef = useRef()
+    const texture01 = useFBO()
+    // const texture01 = useTexture("./textures/clouds_02.jpg")
     const viewport = useThree(state => state.viewport)
+    const [scene] = useState(() => new Scene())
 
     useFrame((state) => {
       let time = state.clock.getElapsedTime()
   
       // start from 20 to skip first 20 seconds ( optional )
       meshRef.current.material.uniforms.uTime.value = time
+
+      // Tie lens to the pointer
+      // getCurrentViewport gives us the width & height that would fill the screen in threejs units
+      // By giving it a target coordinate we can offset these bounds, for instance width/height for a plane that
+      // sits 15 units from 0/0/0 towards the camera (which is where the lens is)
+      const viewportFBO = state.viewport.getCurrentViewport(state.camera, [0, 0, 15])
+    
+      // This is entirely optional but spares us one extra render of the scene
+      // The createPortal below will mount the children of <Lens> into the new THREE.Scene above
+      // The following code will render that scene into a buffer, whose texture will then be fed into
+      // a plane spanning the full screen and the lens transmission material
+      state.gl.setRenderTarget(texture01)
+      state.gl.setClearColor('#d8d7d7')
+      state.gl.render(scene, state.camera)
+      state.gl.setRenderTarget(null)
     
     })
   
