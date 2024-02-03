@@ -5,6 +5,7 @@ import { useRef, useMemo } from "react"
 import vertexShader from "./shader/vertexShader.js"
 import fragmentShader from "./shader/fragmentShader.js"
 import { DoubleSide, Vector2 } from "three"
+import { MeshNormalMaterial } from "three"
 
 
 export default function Shader(){
@@ -42,7 +43,16 @@ export default function Shader(){
 
   return (
     <>
-      <OrbitControls />    
+      <OrbitControls /> 
+      <mesh
+      position = {[0, 0.5, -4]}
+      rotation = {[2, 4, 1]}
+      >
+        <boxGeometry />
+        <meshNormalMaterial />
+      </mesh>
+
+
       <mesh 
       ref={meshRef}
       scale={[viewport.width, viewport.height, 1]}
@@ -53,6 +63,7 @@ export default function Shader(){
             vertexShader={vertexShader}
             fragmentShader={fragmentShader}
             side={DoubleSide}
+            transparent={true}
           />
         </mesh>
    </>

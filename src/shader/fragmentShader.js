@@ -110,15 +110,14 @@ float PI = 3.1415926;
 	
 	
 	void main() {
-		// vec2 uv = (gl_FragCoord.xy - .5 * uResolution.xy ) / uResolution.y;
-		vec2 uv = vUv;
+
 		vec3 col = vec3(0.0);
 		
 		float uTime = uTime * 2.;
         
         // camera position
 		vec3 ro = vec3(-1.0, -1., 1.);
-		vec3 rd = normalize(vec3(uv.x, uv.y + 0.2 , 2.));
+		vec3 rd = normalize(vec3(vUv.x, vUv.y + 0.2 , 2.));
 		vec3 ld =  vec3(0., 0., 1.);
 		float d = rayMarch(ro, rd);
 		vec3 p = ro + rd * d;
@@ -128,12 +127,12 @@ float PI = 3.1415926;
 		vec3 oil = vec3(noise(n.xy * 2.7), noise(n.xy * 3.), noise(n.xy * 3.3)); 
 		
 		vec2 camUV = vUv;
-		vec4 cam1 = texture2D(texture01, vUv);
+		vec4 cam1 = texture2D(texture01, camUV);
 		camUV += n.xy * 0.05 * dif;
-		vec3 cam2 = blur(texture01, camUV, 1./uResolution.xy).xyz * 0.9;
+		vec3 cam2 = blur(texture01, camUV, 1./uResolution.xy).xyz * 0.8;
 		vec3 dispersion = vec3(0.);
-		dispersion.r = texture2D(texture01, vec2(camUV.x - n.x * 0.0075,camUV.y)).r;
-		dispersion.b = texture2D(texture01, vec2(camUV.x + n.y * 0.0075, camUV.y)).b;
+		dispersion.r = texture2D(texture01, vec2(camUV.x - n.x * 0.0095,camUV.y)).r;
+		dispersion.b = texture2D(texture01, vec2(camUV.x + n.y * 0.0095, camUV.y)).b;
 		dispersion.g = texture2D(texture01, camUV).g;
 	
 		col = dif * cam2;
@@ -142,13 +141,14 @@ float PI = 3.1415926;
 		col += fresnel * 0.3;
 		col = mix(col, dispersion, (abs(n.x) + abs(n.y)) * 0.3);
 		
-		if (d > MAX_DIST) { col = vec3(cam1);  }
-	
-		gl_FragColor = vec4(col, 1.0);
-		// gl_FragColor = cam1;
-        // gl_FragColor = texture2D(texture01, vUv);
+		if (d > MAX_DIST) { 
+            // Set the alpha to 0 for parts outside the raymarched object
+            gl_FragColor = vec4(1.,1.,1.,0.0);
+        } else {
+            // Set the alpha to 1 for parts inside the raymarched object
+            gl_FragColor = vec4(col, 1.0);
 	}
-	
+}
 
 
 `
