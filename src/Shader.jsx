@@ -12,12 +12,15 @@ export default function Shader(){
     const meshRef = useRef();
 
     const size = useThree(state => state.size)
+    const pointer = useThree(state => state.pointer)
 
     useFrame((state) => {
       let time = state.clock.getElapsedTime()      
       meshRef.current.material.uniforms.uTime.value = time
-      meshRef.current.material.uniforms.uResolution.value = new Vector2(size.width, size.height);
-      console.log(size.width)
+      meshRef.current.material.uniforms.uResolution.value = new Vector2(size.width, size.height)
+      meshRef.current.material.uniforms.uMouse.value = new Vector2((pointer.x * size.width), (pointer.y * size.height))
+
+      console.log(pointer)
     })
   
       // Define the shader uniforms with memoization to optimize performance
@@ -30,7 +33,11 @@ export default function Shader(){
           uResolution: {
             type: "v2",
             value: new Vector2(size.width, size.height),
-            }
+            },
+          uMouse: {
+            type: "v2",
+            value: new Vector2(pointer.x, pointer.y)
+          }
          }),[size.width, size.height]
          
       )   

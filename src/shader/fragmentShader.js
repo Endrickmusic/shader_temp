@@ -4,6 +4,7 @@ uniform float uTime;
 uniform float progress;
 uniform sampler2D texture01;
 uniform vec2 uResolution;
+uniform vec2 uMouse;
 
 varying vec2 vUv;
 varying vec3 vPosition;
@@ -34,8 +35,8 @@ const int ITER_FRAGMENT =5;
 
 // Constants that represent physical characteristics of the sea, can and should be changed and 
 //  played with
-const float SEA_HEIGHT = 4.2;
-const float SEA_CHOPPY = 1.0;
+const float SEA_HEIGHT = 3.2;
+const float SEA_CHOPPY = 2.0;
 const float SEA_SPEED = 0.5;
 const float SEA_FREQ = 0.12;
 const vec3 SEA_BASE = vec3(0.11,0.19,0.22);
@@ -274,17 +275,27 @@ float map_detailed(vec3 p) {
 // l: light (sun) direction
 // eye: ray direction from camera position for this pixel
 // dist: distance from camera to point <p> on ocean surface
-vec3 getSeaColor(vec3 p, vec3 n, vec3 l, vec3 eye, vec3 dist) {  
+vec3 getSeaColor(vec3 p, vec3 n, vec3 l, vec3 eye, vec3 dist, vec2 uv) {  
     // bteitler: Fresnel is an exponential that gets bigger when the angle between ocean
     // surface normal and eye ray is smaller
     float fresnel = 1.0 - max(dot(n,-eye),0.0);
-    fresnel = pow(fresnel,3.0) * 0.45;
+    fresnel = pow(fresnel,3.0) * 0.3;
         
     // bteitler: Bounce eye ray off ocean towards sky, and get the color of the sky
-    vec3 reflected = getSkyColor(reflect(eye,n))*0.99;    
     
+    // vec2 noiseUV = uv * 50.0; // Scale the UV coordinates to control the frequency of noise
+    // float noiseTexture = noise(vec2(noiseUV.x*cos(uTime), noiseUV.y*(sin(uTime))));
+
+    // Output grayscale value
+    // vec3 noiseColor = vec3(noiseTexture);
+    // vec3 col = vec3(0.7, 0.0, 0.11) * noiseColor; // Adjust the color here as needed
+    // vec3 reflected = col;
+
+    vec3 reflected = getSkyColor(reflect(eye,n))*0.99;    
+
     // bteitler: refraction effect based on angle between light surface normal
     vec3 refracted = SEA_BASE + diffuse(n,l,80.0) * SEA_WATER_COLOR * 0.27; 
+    // vec3 refracted = vec3(0.0); 
     
     // bteitler: blend the refracted color with the reflected color based on our fresnel term
     vec3 color = mix(refracted,reflected,fresnel);
@@ -409,16 +420,16 @@ void main() {
     // This will be used to drive where the user is looking in world space.
    // vec3 ang = vec3(sin(time*3.0)*0.1,sin(time)*0.2+0.3,time);
     float roll = PI + sin(uTime)/14.0 + cos(uTime/2.0)/14.0 ;
-    float pitch = PI*1.021 + (sin(uTime/2.0)+ cos(uTime))/40.0; 
-        // + (iMouse.y/uResolution.y - .8)*PI/3.0  ;
-    // float yaw = iMouse.x/uResolution.x * PI * 4.0;
-    float yaw = PI * 4.0;
-    vec3 ang = vec3(0., .60,yaw);
+    float pitch = PI*1.021 + (sin(uTime/2.0)+ cos(uTime))/40.0 
+        + (uMouse.y/uResolution.y - .8)*PI/3.0  ;
+    float yaw = uMouse.x/uResolution.x * PI * 4.0;
+    // float yaw = PI * 4.0;
+    vec3 ang = vec3(0., 1.15,yaw);
    // vec3 ang = vec3(roll,pitch,0);
     
     // bteitler: Calculate the "origin" of the camera in world space based on time.  Camera is located
     // at height 3.5 atx 0 (zero), and flies over the ocean in the z axis over time.
-    vec3 ori = vec3(0.0,12.5, 3.0);
+    vec3 ori = vec3(-15.0,15.5, 5.0);
    
     // bteitler: This is the ray direction we are shooting from the camera location ("ori") that we need to light
     // for this pixel.  The -2.0 indicates we are using a focal length of 2.0 - this is just an artistic choice and
@@ -460,7 +471,7 @@ void main() {
              
     // CaliCoastReplay:  Get the sky and sea colors
 	vec3 skyColor = getSkyColor(dir);
-    vec3 seaColor = getSeaColor(p,n,light,dir,dist);
+    vec3 seaColor = getSeaColor(p, n, light, dir, dist, uv);
     
     //Sea/sky preprocessing
     
@@ -565,10 +576,10 @@ void main() {
     //Replace the final color with the adjusted, translated HSV values
     gl_FragColor = vec4(hsv2rgb(hsv), 1.0);
     // gl_FragColor = vec4(uv, 0.0, 1.0);
+
+   
 }
 	
-
-
 `
 
 export default fragmentShader
