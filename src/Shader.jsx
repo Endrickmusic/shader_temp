@@ -1,4 +1,4 @@
-import { OrbitControls } from "@react-three/drei"
+import { OrbitControls, useAspect } from "@react-three/drei"
 import { useFrame, useThree } from "@react-three/fiber"
 import { useRef, useMemo } from "react"
 
@@ -10,13 +10,14 @@ import { DoubleSide, Vector2 } from "three"
 export default function Shader(){
 
     const meshRef = useRef();
-  
+
+    const size = useThree(state => state.size)
+
     useFrame((state) => {
-      let time = state.clock.getElapsedTime()
-  
-      // start from 20 to skip first 20 seconds ( optional )
+      let time = state.clock.getElapsedTime()      
       meshRef.current.material.uniforms.uTime.value = time
-    
+      meshRef.current.material.uniforms.uResolution.value = new Vector2(size.width, size.height);
+      console.log(size.width)
     })
   
       // Define the shader uniforms with memoization to optimize performance
@@ -28,17 +29,18 @@ export default function Shader(){
               },
           uResolution: {
             type: "v2",
-            value: new Vector2(4, 3),
+            value: new Vector2(size.width, size.height),
             }
-         }),[]
+         }),[size.width, size.height]
+         
       )   
-      const viewport = useThree(state => state.viewport)
+
   return (
     <>
       <OrbitControls />    
       <mesh 
       ref={meshRef}
-      scale={[viewport.width, viewport.height, 1]}
+      scale={[size.width, size.height, 1]}
       >
           <planeGeometry args={[1, 1]} />
           <shaderMaterial

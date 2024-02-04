@@ -3,7 +3,7 @@ const fragmentShader = `
 uniform float uTime;
 uniform float progress;
 uniform sampler2D texture01;
-uniform vec4 uResolution;
+uniform vec2 uResolution;
 
 varying vec2 vUv;
 varying vec3 vPosition;
@@ -20,12 +20,7 @@ varying vec3 vColor;
 
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 
-// PI is a mathematical constant relating the ratio of a circle's circumference (distance around
-// the edge) to its diameter (distance between two points opposite on the edge).  
-// Change pi at your own peril, with your own apologies to God.
 const float PI	 	= 3.14159265358;
-
-// Can you explain these epsilons to a wide graphics audience?  YOUR comment could go here.
 const float EPSILON	= 1e-3;
 #define  EPSILON_NRM	(0.5 / uResolution.x)
 
@@ -342,7 +337,7 @@ vec3 getNormal(vec3 p, float eps) {
 // }
 
 // bteitler: Find out where a ray intersects the current ocean
-float heightMapTracing(vec3 ori, vec3 dir, out vec3 p) {  
+    float heightMapTracing(vec3 ori, vec3 dir, out vec3 p) {  
     float tm = 0.0;
     float tx = 500.0; // bteitler: a really far distance, this could likely be tweaked a bit as desired
 
@@ -402,8 +397,8 @@ float heightMapTracing(vec3 ori, vec3 dir, out vec3 p) {
 void main() {
     // bteitler: 2D Pixel location passed in as raw pixel, let's divide by resolution
     // to convert to coordinates between 0 and 1
-    // vec2 uv = gl_FragCoord.xy / uResolution.xy;
-    vec2 uv = vUv;
+    vec2 uv = gl_FragCoord.xy / uResolution.xy;
+    // vec2 uv = vUv;
     uv = uv * 2.0 - 1.0; //  bteitler: Shift pixel coordinates from 0 to 1 to between -1 and 1
     uv.x *= uResolution.x / uResolution.y; // bteitler: Aspect ratio correction - if you don't do this your rays will be distorted
     float time = uTime * .7; // bteitler: Animation is based on time, but allows you to scrub the animation based on mouse movement
@@ -475,7 +470,7 @@ void main() {
     
     
     // //CaliCoastReplay:  Day/night mode
-    // bool night; 	 
+    bool night; 	 
     // if( isKeyPressed(KEY_SP) > 0.0 )    //night mode!
     // {
     //     //Brighten the sea up again, but not too bright at night
@@ -490,10 +485,10 @@ void main() {
     // else  //day mode!
     // {
     //     //Brighten the sea up again - bright and beautiful blue at day
-    // 	seaColor *= sqrt(sqrt(seaColor)) * 4.0;
-    //     skyColor *= 1.05;
-    //     skyColor -= 0.03;
-    //     night = false;
+    	seaColor *= sqrt(sqrt(seaColor)) * 4.0;
+        skyColor *= 1.05;
+        skyColor -= 0.03;
+        night = false;
     // }
 
     
@@ -562,14 +557,14 @@ void main() {
         //This really "cinemafies" it for the day -
         //puts the saturation on a squared, highly magnified footing.
         //Worth looking into more as to exactly why.
-       // hsv.y *= 5.10 * hsv.y * sqrt(hsv.y);
+       hsv.y *= 5.10 * hsv.y * sqrt(hsv.y);
         hsv.y += 0.07;
     // }
     
     //CaliCoastReplay:    
     //Replace the final color with the adjusted, translated HSV values
     gl_FragColor = vec4(hsv2rgb(hsv), 1.0);
-    
+    // gl_FragColor = vec4(uv, 0.0, 1.0);
 }
 	
 
