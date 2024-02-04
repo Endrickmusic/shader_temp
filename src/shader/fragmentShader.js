@@ -420,16 +420,17 @@ void main() {
     // This will be used to drive where the user is looking in world space.
    // vec3 ang = vec3(sin(time*3.0)*0.1,sin(time)*0.2+0.3,time);
     float roll = PI + sin(uTime)/14.0 + cos(uTime/2.0)/14.0 ;
-    float pitch = PI*1.021 + (sin(uTime/2.0)+ cos(uTime))/40.0 
-        + (uMouse.y/uResolution.y - .8)*PI/3.0  ;
+    // float pitch = PI*1.021 + (sin(uTime/2.0)+ cos(uTime))/40.0 
+    //     + (uMouse.y/uResolution.y - .8) * PI/3.0  ;
     float yaw = uMouse.x/uResolution.x * PI * 4.0;
+    float pitch = (-uMouse.y/uResolution.y) * PI * 3.0;
     // float yaw = PI * 4.0;
-    vec3 ang = vec3(0., 1.15,yaw);
+    vec3 ang = vec3(0., pitch, yaw);
    // vec3 ang = vec3(roll,pitch,0);
     
     // bteitler: Calculate the "origin" of the camera in world space based on time.  Camera is located
     // at height 3.5 atx 0 (zero), and flies over the ocean in the z axis over time.
-    vec3 ori = vec3(-15.0,15.5, 5.0);
+    vec3 ori = vec3(0.0,15.5, 0.0);
    
     // bteitler: This is the ray direction we are shooting from the camera location ("ori") that we need to light
     // for this pixel.  The -2.0 indicates we are using a focal length of 2.0 - this is just an artistic choice and
