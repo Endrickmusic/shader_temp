@@ -1,7 +1,7 @@
 import { Canvas } from '@react-three/fiber'
 
 import './index.css'
-import Shader from './Shader.jsx'
+import Shader from './Ocean_Shader.jsx'
 
 function App() {
   

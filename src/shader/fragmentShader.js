@@ -436,7 +436,7 @@ void main() {
     // for this pixel.  The -2.0 indicates we are using a focal length of 2.0 - this is just an artistic choice and
     // results in about a 90 degree field of view.
     //  CaliCoastReplay :  Adjusted slightly to a lower focal length.  Seems to dramatize the scene.
-    vec3 dir = normalize(vec3(uv.xy,-1.6)); 
+    vec3 dir = normalize(vec3(uv.xy,-2.0)); 
 
     // bteitler: Distort the ray a bit for a fish eye effect (if you remove this line, it will remove
     // the fish eye effect and look like a realistic perspective).
